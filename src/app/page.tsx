@@ -1,6 +1,8 @@
 "use client";
 
 import Editor, { EditorProps } from "@monaco-editor/react";
+import type * as monaco from "monaco-editor";
+import { useRef } from "react";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -84,8 +86,13 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
 
 /**
  * @see https://github.com/suren-atoyan/monaco-react
+ * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Home() {
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+    editorRef.current = editor;
+  }
   return (
     <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
       <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
@@ -93,11 +100,12 @@ export default function Home() {
           <option>Linear search</option>
         </select>
       </div>
-      <CodeEditor />
+      <CodeEditor onMount={handleEditorDidMount} />
       <ReadOnlyEditor />
       <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
         <button
           className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          onClick={() => console.log(editorRef.current?.getValue())}
           type="button"
         >
           Run code

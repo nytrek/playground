@@ -17,6 +17,9 @@ dependencies:
   clsx:
     specifier: ^2.0.0
     version: 2.0.0
+  monaco-editor:
+    specifier: ^0.45.0
+    version: 0.45.0
   next:
     specifier: 14.0.4
     version: 14.0.4(react-dom@18.2.0)(react@18.2.0)

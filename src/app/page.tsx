@@ -1,8 +1,11 @@
 "use client";
 
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Editor, { type EditorProps } from "@monaco-editor/react";
+import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
 import type * as monaco from "monaco-editor";
 import { useRef, useState } from "react";
+import { Toaster, toast } from "sonner";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -15,6 +18,18 @@ const DEFAULT_OPTIONS = {
   fontSize: 16,
   wordWrap: "on",
 } as const satisfies EditorProps["options"];
+
+const springTransition: Transition = {
+  type: "spring",
+  bounce: 0.2,
+  duration: 0.6,
+};
+
+const springVariants: Variants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: springTransition },
+  exit: { opacity: 0, y: 20, transition: springTransition },
+};
 
 /**
  * @see https://react-svgr.com/playground/
@@ -124,40 +139,89 @@ test("binary search array", function() {
 });`,
     },
   ];
+  const [warnings, setWarnings] = useState(0);
   const [exercise, setExercise] = useState(exercises[0]);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
   }
+  function handleEditorValidation(markers: monaco.editor.IMarker[]) {
+    setWarnings(markers.length);
+    markers.forEach((marker) => console.log("onValidate:", marker.message));
+  }
+  function handleOnClick() {
+    try {
+      eval(editorRef.current?.getValue() ?? "");
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  }
   return (
-    <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
-      <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
-        <select
-          className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
-          onChange={(e) =>
-            setExercise(
-              exercises.find(
-                (item) => item.name === e.target.value,
-              ) as typeof exercise,
-            )
-          }
-        >
-          {exercises.map((item) => (
-            <option key={item.name}>{item.name}</option>
-          ))}
-        </select>
+    <>
+      <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
+        <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+          <select
+            className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
+            onChange={(e) =>
+              setExercise(
+                exercises.find(
+                  (item) => item.name === e.target.value,
+                ) as typeof exercise,
+              )
+            }
+          >
+            {exercises.map((item) => (
+              <option key={item.name}>{item.name}</option>
+            ))}
+          </select>
+        </div>
+        <CodeEditor
+          onMount={handleEditorDidMount}
+          onValidate={handleEditorValidation}
+        />
+        <ReadOnlyEditor value={exercise.test} />
+        <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+          <AnimatePresence mode="wait">
+            {warnings ? (
+              <motion.div
+                animate="animate"
+                className="flex items-center gap-x-2"
+                exit="exit"
+                initial="initial"
+                key={warnings}
+                variants={springVariants}
+              >
+                <XCircleIcon className="h-6 w-6 text-red-600" />
+                <span className="w-full text-white">
+                  {warnings > 1
+                    ? `${warnings} warnings`
+                    : `${warnings} warning`}
+                </span>
+              </motion.div>
+            ) : (
+              <motion.div
+                animate="animate"
+                className="flex items-center gap-x-2"
+                exit="exit"
+                initial="initial"
+                key={warnings}
+                variants={springVariants}
+              >
+                <CheckCircleIcon className="h-6 w-6 text-green-600" />
+                <span className="w-full text-white">No warnings</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <button
+            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            onClick={() => handleOnClick()}
+            type="button"
+          >
+            Run code
+          </button>
+        </div>
       </div>
-      <CodeEditor onMount={handleEditorDidMount} />
-      <ReadOnlyEditor value={exercise.test} />
-      <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
-        <button
-          className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          onClick={() => console.log(editorRef.current?.getValue())}
-          type="button"
-        >
-          Run code
-        </button>
-      </div>
-    </div>
+      <Toaster position="top-center" visibleToasts={1} />
+    </>
   );
 }

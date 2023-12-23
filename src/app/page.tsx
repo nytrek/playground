@@ -85,7 +85,13 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
 export default function Home() {
   return (
     <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
-      <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
+      <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+        <select className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white">
+          <option>Linked list</option>
+          <option>Queue</option>
+          <option>Stack</option>
+        </select>
+      </div>
       <CodeEditor />
       <ReadOnlyEditor />
       <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>

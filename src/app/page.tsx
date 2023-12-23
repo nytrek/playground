@@ -2,7 +2,12 @@
 
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Editor, { type EditorProps } from "@monaco-editor/react";
-import { AnimatePresence, Transition, Variants, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  type Transition,
+  type Variants,
+} from "framer-motion";
 import type * as monaco from "monaco-editor";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";

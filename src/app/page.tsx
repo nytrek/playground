@@ -1,6 +1,6 @@
 "use client";
 
-import Editor, { EditorProps } from "@monaco-editor/react";
+import Editor, { type EditorProps } from "@monaco-editor/react";
 import type * as monaco from "monaco-editor";
 import { useRef } from "react";
 
@@ -22,24 +22,24 @@ const DEFAULT_OPTIONS = {
 const Loading: React.FC<React.SVGAttributes<SVGSVGElement>> = (props) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      className="h-10 w-10 animate-spin text-white"
-      viewBox="0 0 24 24"
       {...props}
+      className="h-10 w-10 animate-spin text-white"
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <circle
+        className="opacity-25"
         cx={12}
         cy={12}
         r={10}
         stroke="currentColor"
         strokeWidth={4}
-        className="opacity-25"
       />
       <path
-        fill="currentColor"
-        d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         className="opacity-75"
+        d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        fill="currentColor"
       />
     </svg>
   );

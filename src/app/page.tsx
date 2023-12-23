@@ -2,17 +2,10 @@
 
 import Editor, { EditorProps } from "@monaco-editor/react";
 
-const DEFAULT_OPTIONS = {
-  fixedOverflowWidgets: true,
-  lineNumbers: "on",
-  tabSize: 2,
-  insertSpaces: false,
-  minimap: {
-    enabled: false,
-  },
-  fontSize: 16,
-} as const satisfies EditorProps["options"];
-
+/**
+ * @see https://react-svgr.com/playground/
+ * @see https://tailwindcss.com/docs/animation
+ */
 const Loading: React.FC<React.SVGAttributes<SVGSVGElement>> = (props) => {
   return (
     <svg
@@ -39,6 +32,35 @@ const Loading: React.FC<React.SVGAttributes<SVGSVGElement>> = (props) => {
   );
 };
 
+/**
+ * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/code-editor.tsx
+ */
+const CodeEditor: React.FC<EditorProps> = (props) => {
+  return (
+    <Editor
+      {...props}
+      className="border border-zinc-700"
+      defaultLanguage="typescript"
+      height="45%"
+      loading={<Loading />}
+      options={{
+        fixedOverflowWidgets: true,
+        lineNumbers: "on",
+        tabSize: 2,
+        insertSpaces: false,
+        minimap: {
+          enabled: false,
+        },
+        fontSize: 16,
+      }}
+      theme="vs-dark"
+    />
+  );
+};
+
+/**
+ * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/split-editor.tsx
+ */
 const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
   return (
     <Editor
@@ -59,20 +81,12 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
 
 /**
  * @see https://github.com/suren-atoyan/monaco-react
- * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/code-editor.tsx
  */
 export default function Home() {
   return (
     <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
       <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
-      <Editor
-        className="border border-zinc-700"
-        defaultLanguage="typescript"
-        height="45%"
-        loading={<Loading />}
-        options={DEFAULT_OPTIONS}
-        theme="vs-dark"
-      />
+      <CodeEditor />
       <ReadOnlyEditor />
       <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
     </div>

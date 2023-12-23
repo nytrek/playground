@@ -2,7 +2,7 @@
 
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import type * as monaco from "monaco-editor";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -71,7 +71,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
     <Editor
       {...props}
       className="border border-zinc-700"
-      defaultLanguage="typescript"
+      defaultLanguage="javascript"
       height="45%"
       loading={<Loading />}
       options={{
@@ -90,6 +90,41 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Home() {
+  const exercises = [
+    {
+      name: "Linear search",
+      test: `
+/*
+ * @see https://github.com/ThePrimeagen/kata-machine/blob/master/src/__tests__/LinearSearchList.ts
+*/
+test("linear search array", function() {
+  const foo = [1, 3, 4, 69, 71, 81, 90, 99, 420, 1337, 69420];
+  expect(linear_fn(foo, 69)).toEqual(true);
+  expect(linear_fn(foo, 1336)).toEqual(false);
+  expect(linear_fn(foo, 69420)).toEqual(true);
+  expect(linear_fn(foo, 69421)).toEqual(false);
+  expect(linear_fn(foo, 1)).toEqual(true);
+  expect(linear_fn(foo, 0)).toEqual(false);
+});`,
+    },
+    {
+      name: "Binary search",
+      test: `
+/*
+ * @see https://github.com/ThePrimeagen/kata-machine/blob/master/src/__tests__/BinarySearchList.ts
+*/
+test("binary search array", function() {
+  const foo = [1, 3, 4, 69, 71, 81, 90, 99, 420, 1337, 69420];
+  expect(binary_fn(foo, 69)).toEqual(true);
+  expect(binary_fn(foo, 1336)).toEqual(false);
+  expect(binary_fn(foo, 69420)).toEqual(true);
+  expect(binary_fn(foo, 69421)).toEqual(false);
+  expect(binary_fn(foo, 1)).toEqual(true);
+  expect(binary_fn(foo, 0)).toEqual(false);
+});`,
+    },
+  ];
+  const [exercise, setExercise] = useState(exercises[0]);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
     editorRef.current = editor;
@@ -97,12 +132,23 @@ export default function Home() {
   return (
     <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
       <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
-        <select className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white">
-          <option>Linear search</option>
+        <select
+          className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
+          onChange={(e) =>
+            setExercise(
+              exercises.find(
+                (item) => item.name === e.target.value,
+              ) as typeof exercise,
+            )
+          }
+        >
+          {exercises.map((item) => (
+            <option key={item.name}>{item.name}</option>
+          ))}
         </select>
       </div>
       <CodeEditor onMount={handleEditorDidMount} />
-      <ReadOnlyEditor />
+      <ReadOnlyEditor value={exercise.test} />
       <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
         <button
           className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"

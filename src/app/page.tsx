@@ -45,7 +45,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       {...props}
       className="border border-zinc-700"
       defaultLanguage="typescript"
-      height="40vh"
+      height="45%"
       loading={<Loading />}
       options={{
         lineNumbers: "off",
@@ -63,18 +63,18 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  */
 export default function Home() {
   return (
-    <div className="rounded-lg">
-      <div className="sticky top-0 flex h-[40px] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
+    <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
+      <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
       <Editor
         className="border border-zinc-700"
         defaultLanguage="typescript"
-        height="40vh"
+        height="45%"
         loading={<Loading />}
         options={DEFAULT_OPTIONS}
         theme="vs-dark"
       />
       <ReadOnlyEditor />
-      <div className="sticky bottom-0 flex h-[40px] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
+      <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
     </div>
   );
 }

@@ -13,6 +13,7 @@ const DEFAULT_OPTIONS = {
     enabled: false,
   },
   fontSize: 16,
+  wordWrap: "on",
 } as const satisfies EditorProps["options"];
 
 /**

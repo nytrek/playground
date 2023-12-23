@@ -2,6 +2,17 @@
 
 import Editor, { EditorProps } from "@monaco-editor/react";
 
+const DEFAULT_OPTIONS = {
+  fixedOverflowWidgets: true,
+  lineNumbers: "on",
+  tabSize: 2,
+  insertSpaces: false,
+  minimap: {
+    enabled: false,
+  },
+  fontSize: 16,
+} as const satisfies EditorProps["options"];
+
 /**
  * @see https://react-svgr.com/playground/
  * @see https://tailwindcss.com/docs/animation
@@ -43,16 +54,7 @@ const CodeEditor: React.FC<EditorProps> = (props) => {
       defaultLanguage="typescript"
       height="45%"
       loading={<Loading />}
-      options={{
-        fixedOverflowWidgets: true,
-        lineNumbers: "on",
-        tabSize: 2,
-        insertSpaces: false,
-        minimap: {
-          enabled: false,
-        },
-        fontSize: 16,
-      }}
+      options={DEFAULT_OPTIONS}
       theme="vs-dark"
     />
   );
@@ -70,6 +72,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       height="45%"
       loading={<Loading />}
       options={{
+        ...DEFAULT_OPTIONS,
         lineNumbers: "off",
         renderValidationDecorations: "on",
         readOnly: true,
@@ -87,14 +90,19 @@ export default function Home() {
     <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
       <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
         <select className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white">
-          <option>Linked list</option>
-          <option>Queue</option>
-          <option>Stack</option>
+          <option>Linear search</option>
         </select>
       </div>
       <CodeEditor />
       <ReadOnlyEditor />
-      <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2"></div>
+      <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+        <button
+          className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          type="button"
+        >
+          Run code
+        </button>
+      </div>
     </div>
   );
 }

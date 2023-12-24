@@ -35,7 +35,7 @@ const springTransition: Transition = {
 const springVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0, transition: springTransition },
-  exit: { opacity: 0, y: 20, transition: springTransition },
+  exit: { opacity: 0, y: -20, transition: springTransition },
 };
 
 /**
@@ -168,7 +168,7 @@ export default function Playground() {
           }
         />
         <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             {warnings ? (
               <motion.div
                 animate="animate"

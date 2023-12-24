@@ -13,8 +13,9 @@ import {
   type Variants,
 } from "framer-motion";
 import type * as monaco from "monaco-editor";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
+import { createSubmission } from "./actions";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -116,7 +117,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  */
 export default function Playground() {
   const { user } = useKindeBrowserClient();
-  const { complete, completion, isLoading } = useCompletion();
+  const { complete, completion, error, isLoading } = useCompletion();
   const exercises = ["Linear search", "Binary search"];
   const [warnings, setWarnings] = useState(0);
   const [exercise, setExercise] = useState(exercises[0]);
@@ -128,15 +129,35 @@ export default function Playground() {
     setWarnings(markers.length);
     markers.forEach((marker) => console.log("onValidate:", marker.message));
   }
-  async function handleOnClick() {
+  /**
+   * @see https://sdk.vercel.ai/docs/api-reference/use-completion
+   */
+  const handleOnClick = useCallback(async () => {
     if (!editorRef.current?.getValue())
       return toast.warning("Submission cannot be empty.");
-    await complete(editorRef.current.getValue(), {
+    const response = await complete(editorRef.current.getValue(), {
       body: {
         exercise,
       },
     });
-  }
+    if (error) {
+      toast.error(error.message);
+    } else {
+      if (response) {
+        try {
+          await createSubmission({
+            exercise,
+            submission: editorRef.current.getValue(),
+            response,
+            passed: response.includes("{ passed: true }"),
+            userId: user?.id as string,
+          });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+      }
+    }
+  }, [complete]);
   return (
     <>
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">

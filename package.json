@@ -15,6 +15,8 @@
     "@heroicons/react": "^2.1.1",
     "@kinde-oss/kinde-auth-nextjs": "^2.0.13",
     "@monaco-editor/react": "^4.6.0",
+    "@prisma/client": "5.7.1",
+    "@prisma/extension-accelerate": "^0.6.2",
     "ai": "^2.2.30",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.16",
@@ -25,7 +27,8 @@
     "react": "^18",
     "react-dom": "^18",
     "sonner": "^1.2.4",
-    "tailwind-merge": "^2.2.0"
+    "tailwind-merge": "^2.2.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

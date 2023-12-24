@@ -3,7 +3,7 @@
 import { cn } from "@/utils/cn";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Editor, { type EditorProps } from "@monaco-editor/react";
-import { useChat } from "ai/react";
+import { useCompletion } from "ai/react";
 import {
   AnimatePresence,
   motion,
@@ -78,7 +78,7 @@ const CodeEditor: React.FC<EditorProps> = (props) => {
       className="border border-zinc-700"
       defaultLanguage="typescript"
       height="45%"
-      loading={<Loading className="w-10 h-10" />}
+      loading={<Loading className="h-10 w-10" />}
       options={DEFAULT_OPTIONS}
       theme="vs-dark"
     />
@@ -95,7 +95,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       className="border border-zinc-700"
       defaultLanguage="typescript"
       height="40%"
-      loading={<Loading className="w-10 h-10" />}
+      loading={<Loading className="h-10 w-10" />}
       options={{
         ...DEFAULT_OPTIONS,
         lineNumbers: "off",
@@ -109,10 +109,11 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
 
 /**
  * @see https://github.com/suren-atoyan/monaco-react
+ * @see https://sdk.vercel.ai/docs/api-reference/use-completion
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Playground() {
-  const { messages, append, isLoading, setMessages } = useChat();
+  const { complete, completion, isLoading } = useCompletion();
   const exercises = ["Linear search", "Binary search"];
   const [warnings, setWarnings] = useState(0);
   const [exercise, setExercise] = useState(exercises[0]);
@@ -124,21 +125,14 @@ export default function Playground() {
     setWarnings(markers.length);
     markers.forEach((marker) => console.log("onValidate:", marker.message));
   }
-  function handleOnClick() {
-    try {
-      console.log(messages)
-      if (!editorRef.current?.getValue())
-        return toast.warning("Submission cannot be empty.");
-      setMessages([])
-      append({
-        content: `Analyze if the provided implementation of ${exercise} in typescript is correct - "${editorRef.current
-          .getValue()
-          .trim()}". Only respond using code comments and code directly without using markdown.`,
-        role: "user",
-      });
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+  async function handleOnClick() {
+    if (!editorRef.current?.getValue())
+      return toast.warning("Submission cannot be empty.");
+    await complete(
+      `Analyze if the provided implementation of ${exercise} in typescript is correct - "${editorRef.current
+        .getValue()
+        .trim()}". Only respond using code comments and code directly without using markdown.`,
+    );
   }
   return (
     <>
@@ -146,7 +140,13 @@ export default function Playground() {
         <div className="sticky top-0 flex h-[7.5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
-            onChange={(e) => setExercise(exercises.find((item) => item === e.target.value) as typeof exercise)}
+            onChange={(e) =>
+              setExercise(
+                exercises.find(
+                  (item) => item === e.target.value,
+                ) as typeof exercise,
+              )
+            }
           >
             {exercises.map((item) => (
               <option key={item}>{item}</option>
@@ -157,13 +157,7 @@ export default function Playground() {
           onMount={handleEditorDidMount}
           onValidate={handleEditorValidation}
         />
-        <ReadOnlyEditor
-          value={
-            [...messages.filter((item) => item.role === "assistant")].slice(
-              -1,
-            )[0]?.content
-          }
-        />
+        <ReadOnlyEditor value={completion} />
         <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
           <AnimatePresence mode="popLayout">
             {warnings ? (
@@ -205,13 +199,11 @@ export default function Playground() {
             onClick={() => handleOnClick()}
             type="button"
           >
-            {
-              isLoading ? (
-                <Loading className="w-5 h-5 text-gray-900"/>
-              ) : (
-                <span>Submit</span>
-              )
-            }
+            {isLoading ? (
+              <Loading className="h-5 w-5 text-gray-900" />
+            ) : (
+              <span>Submit</span>
+            )}
           </button>
         </div>
       </div>

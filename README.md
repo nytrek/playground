@@ -7,11 +7,12 @@ Playground built using Next.JS App router, Monaco editor and Vercel AI SDK
 - AI streaming response with [Vercel AI SDK](https://sdk.vercel.ai/docs)
 - authentication with [kinde](https://kinde.com/)
 - database management with [planetscale](https://planetscale.com/)
+- state management with [zustand](https://github.com/pmndrs/zustand)
 
 # TODO
 - [x] implement auth with kinde
 - [x] set up DB with planetscale
-- [ ] save submissions in DB using prisma
+- [x] save submissions in DB using prisma
 - [ ] set up jest tests
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).

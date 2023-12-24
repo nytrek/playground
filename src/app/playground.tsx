@@ -99,7 +99,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
     m: typeof monaco,
   ) {
     m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore: [2393],
+      diagnosticCodesToIgnore: [2393, 2451],
     });
   }
   return (
@@ -157,7 +157,7 @@ export default function Playground() {
   ) {
     editorRef.current = editor;
     m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore: [2393],
+      diagnosticCodesToIgnore: [2393, 2451],
     });
   }
   function handleEditorValidation(markers: monaco.editor.IMarker[]) {

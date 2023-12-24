@@ -127,10 +127,10 @@ export default function Playground() {
     try {
       if (!editorRef.current?.getValue()) return;
       append({
-        content: `Is the following code snippet a correct implementation of ${exercise} in typescript? - "${editorRef.current
+        content: `Analyze the following implementation of ${exercise} in typescript - "${editorRef.current
           .getValue()
-          .trim()}". Only respond using comments and code directly without using markdown`,
-        role: "system",
+          .trim()}". Only respond using code comments and code directly without using markdown.`,
+        role: "user",
       });
     } catch (error: any) {
       toast.error(error.message);

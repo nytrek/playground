@@ -148,9 +148,9 @@ export default function Playground() {
         >
           {user && (
             <img
+              alt="avatar"
               className="inline-block h-10 w-10 rounded-full bg-zinc-500"
               src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
-              alt="avatar"
             />
           )}
           <select

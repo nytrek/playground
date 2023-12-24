@@ -21,9 +21,10 @@ export async function POST(req: Request) {
         content: `
           Analyze if the provided implementation of ${exercise} in typescript is correct - ${prompt}. 
           Only respond using code comments and code directly without using markdown. 
-          Provide partical feedback to the user and end the response in the following format: // { passed: boolean }.
+          Provide partical feedback to the user.
           All plain text MUST be prefixed with two slashes like so - //
           Provide an alternate solution to a ${exercise} implementation in TypeScript.
+          End the response in the following format: // { passed: boolean }
         `,
       },
     ],

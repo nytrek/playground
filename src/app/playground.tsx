@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/utils/cn";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import { useChat } from "ai/react";
@@ -199,7 +200,11 @@ export default function Playground() {
             )}
           </AnimatePresence>
           <button
-            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className={cn(
+              warnings ? "cursor-not-allowed opacity-50" : "opacity-100",
+              "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50",
+            )}
+            disabled={!!warnings}
             onClick={() => handleOnClick()}
             type="button"
           >

@@ -266,7 +266,11 @@ export default function Playground() {
           </select>
         </div>
         <CodeEditor
-          key={exercise}
+          key={
+            submissions?.find(
+              (item) => item.exercise === exercise && item.userId === user?.id,
+            )?.submission
+          }
           onMount={handleEditorDidMount}
           onValidate={handleEditorValidation}
           value={
@@ -276,6 +280,14 @@ export default function Playground() {
           }
         />
         <ReadOnlyEditor
+          key={
+            completion
+              ? completion
+              : submissions?.find(
+                  (item) =>
+                    item.exercise === exercise && item.userId === user?.id,
+                )?.response
+          }
           value={
             completion
               ? completion

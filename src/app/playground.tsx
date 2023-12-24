@@ -3,7 +3,7 @@
 import { cn } from "@/utils/cn";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import { useCompletion } from "ai/react";
 import {
@@ -142,16 +142,30 @@ export default function Playground() {
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
         <div
           className={cn(
-            user ? "justify-between" : "justify-end",
-            "sticky top-0 flex h-[7.5%] shrink-0 items-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4",
+            user
+              ? "h-[15%] sm:h-[7.5%] sm:justify-between"
+              : "h-[7.5%] sm:justify-end",
+            "sticky top-0 flex shrink-0 flex-col justify-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4 sm:flex-row sm:items-center",
           )}
         >
           {user && (
-            <img
-              alt="avatar"
-              className="inline-block h-10 w-10 rounded-full bg-zinc-500"
-              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
-            />
+            <div className="flex items-center gap-x-3">
+              <div>
+                <img
+                  alt="avatar"
+                  className="inline-block h-9 w-9 rounded-full"
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="max-w-24 truncate text-sm font-medium text-white/90">
+                  {user.id}
+                </span>
+                <LogoutLink className="text-xs font-medium text-white/70">
+                  Logout
+                </LogoutLink>
+              </div>
+            </div>
           )}
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"

@@ -94,7 +94,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       {...props}
       className="border border-zinc-700"
       defaultLanguage="typescript"
-      height="45%"
+      height="40%"
       loading={<Loading />}
       options={{
         ...DEFAULT_OPTIONS,
@@ -130,7 +130,8 @@ export default function Playground() {
   }
   function handleOnClick() {
     try {
-      if (!editorRef.current?.getValue()) return;
+      if (!editorRef.current?.getValue())
+        return toast.warning("Submission cannot be empty.");
       append({
         content: `Analyze if the provided implementation of ${exercise} in typescript is correct - "${editorRef.current
           .getValue()
@@ -144,7 +145,7 @@ export default function Playground() {
   return (
     <>
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
-        <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+        <div className="sticky top-0 flex h-[7.5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
             onChange={(e) => handleOnChange(e.target.value)}
@@ -165,7 +166,7 @@ export default function Playground() {
             )[0]?.content
           }
         />
-        <div className="sticky bottom-0 flex h-[5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
+        <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
           <AnimatePresence mode="popLayout">
             {warnings ? (
               <motion.div

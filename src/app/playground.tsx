@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "@/utils/cn";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Editor, { type EditorProps } from "@monaco-editor/react";
@@ -17,7 +21,12 @@ import {
 import type * as monaco from "monaco-editor";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
-import { createSubmission, updateSubmission } from "./actions";
+import {
+  createSubmission,
+  deleteSubmission,
+  updateSubmission,
+} from "./actions";
+import { exercises, useExerciseStore } from "./store";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -194,10 +203,21 @@ export default function Playground() {
       });
     },
   });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await deleteSubmission({
+        id,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissions"],
+      });
+    },
+  });
   const { complete, completion, error, isLoading } = useCompletion();
-  const exercises = ["Linear search", "Binary search"];
+  const { exercise, setExercise } = useExerciseStore();
   const [warnings, setWarnings] = useState(0);
-  const [exercise, setExercise] = useState(exercises[0]);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   function handleEditorDidMount(
     editor: monaco.editor.IStandaloneCodeEditor,
@@ -294,20 +314,45 @@ export default function Playground() {
               </div>
             </div>
           )}
-          <select
-            className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
-            onChange={(e) =>
-              setExercise(
-                exercises.find(
-                  (item) => item === e.target.value,
-                ) as typeof exercise,
-              )
-            }
-          >
-            {exercises.map((item) => (
-              <option key={item}>{item}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-x-3">
+            {submissions?.find(
+              (item) => item.exercise === exercise && item.userId === user?.id,
+            ) && (
+              <button
+                className="rounded-md border border-zinc-700 p-2"
+                onClick={() =>
+                  toast.promise(
+                    deleteMutation.mutateAsync(
+                      submissions?.find(
+                        (item) =>
+                          item.exercise === exercise &&
+                          item.userId === user?.id,
+                      )?.id as string,
+                    ),
+                    {
+                      loading: "Loading...",
+                      success: () =>
+                        toast.success("Submission resetted successfully!"),
+                      error: (err) => toast.error(err.message),
+                    },
+                  )
+                }
+              >
+                <ArrowPathIcon className="h-5 w-5 text-white" />
+              </button>
+            )}
+            <select
+              className="w-full rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
+              onChange={(e) =>
+                setExercise(e.target.value as (typeof exercises)[number])
+              }
+              value={exercise}
+            >
+              {exercises.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <CodeEditor
           key={exercise + " - submission"}

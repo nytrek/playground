@@ -5,6 +5,8 @@ import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Editor, { type EditorProps } from "@monaco-editor/react";
+import type { Submission } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
 import { useCompletion } from "ai/react";
 import {
   AnimatePresence,
@@ -13,9 +15,9 @@ import {
   type Variants,
 } from "framer-motion";
 import type * as monaco from "monaco-editor";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
-import { createSubmission } from "./actions";
+import { createSubmission, updateSubmission } from "./actions";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -117,6 +119,24 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  */
 export default function Playground() {
   const { user } = useKindeBrowserClient();
+  const { data: submissions } = useQuery({
+    queryKey: ["submissions"],
+    queryFn: async () => {
+      const response = await fetch("/api/submission");
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const { error } = await response.json();
+          throw new Error(
+            error.message ? error.message : "Unable to retrieve submissions",
+          );
+        } else {
+          throw new Error("Unable to retrieve submissions");
+        }
+      }
+      return ((await response.json()) as Submission[]) ?? null;
+    },
+  });
   const { complete, completion, error, isLoading } = useCompletion();
   const exercises = ["Linear search", "Binary search"];
   const [warnings, setWarnings] = useState(0);
@@ -127,7 +147,7 @@ export default function Playground() {
   }
   function handleEditorValidation(markers: monaco.editor.IMarker[]) {
     setWarnings(markers.length);
-    markers.forEach((marker) => console.log("onValidate:", marker.message));
+    // markers.forEach((marker) => console.log("onValidate:", marker.message));
   }
   /**
    * @see https://sdk.vercel.ai/docs/api-reference/use-completion
@@ -142,18 +162,45 @@ export default function Playground() {
     });
     if (error) {
       toast.error(error.message);
+      console.log(error.message);
     } else {
       if (response) {
-        try {
-          await createSubmission({
-            exercise,
-            submission: editorRef.current.getValue(),
-            response,
-            passed: response.includes("{ passed: true }"),
-            userId: user?.id as string,
-          });
-        } catch (err: any) {
-          toast.error(err.message);
+        if (
+          submissions?.find(
+            (item) => item.exercise === exercise && item.userId === user?.id,
+          )
+        ) {
+          const id = submissions?.find(
+            (item) => item.exercise === exercise && item.userId === user?.id,
+          )?.id as string;
+          try {
+            await updateSubmission({
+              id,
+              exercise,
+              submission: editorRef.current.getValue(),
+              response,
+              passed: response.includes("{ passed: true }"),
+              userId: user?.id as string,
+            });
+            toast.success("Submission updated successfully!");
+          } catch (err: any) {
+            toast.error(err.message);
+            console.log(err.message);
+          }
+        } else {
+          try {
+            await createSubmission({
+              exercise,
+              submission: editorRef.current.getValue(),
+              response,
+              passed: response.includes("{ passed: true }"),
+              userId: user?.id as string,
+            });
+            toast.success("Submission saved successfully!");
+          } catch (err: any) {
+            toast.error(err.message);
+            console.log(err.message);
+          }
         }
       }
     }
@@ -204,10 +251,25 @@ export default function Playground() {
           </select>
         </div>
         <CodeEditor
+          key={exercise}
           onMount={handleEditorDidMount}
           onValidate={handleEditorValidation}
+          value={
+            submissions?.find(
+              (item) => item.exercise === exercise && item.userId === user?.id,
+            )?.submission
+          }
         />
-        <ReadOnlyEditor value={completion} />
+        <ReadOnlyEditor
+          value={
+            completion
+              ? completion
+              : submissions?.find(
+                  (item) =>
+                    item.exercise === exercise && item.userId === user?.id,
+                )?.response
+          }
+        />
         <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
           <AnimatePresence mode="popLayout">
             {warnings ? (

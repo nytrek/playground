@@ -17,7 +17,8 @@
     "plugin:react-hooks/recommended",
     "next/core-web-vitals",
     "plugin:jsx-a11y/recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
   ],
   "rules": {
     "no-var": 0,

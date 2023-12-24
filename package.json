@@ -17,6 +17,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@prisma/client": "5.7.1",
     "@prisma/extension-accelerate": "^0.6.2",
+    "@tanstack/react-query": "^5.14.6",
     "ai": "^2.2.30",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.16",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@tanstack/eslint-plugin-query": "^5.14.6",
     "@types/jest": "^29.5.11",
     "@types/node": "^20",
     "@types/react": "^18",

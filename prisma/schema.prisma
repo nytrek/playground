@@ -16,8 +16,8 @@ model Submission {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
   exercise   String
-  submission String
-  response   String
+  submission String   @db.Text
+  response   String   @db.Text
   passed     Boolean  @default(false)
   userId     String
 }

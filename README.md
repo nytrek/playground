@@ -6,11 +6,11 @@ Playground built using Next.JS App router, Monaco editor and Vercel AI SDK
 - visual typescript editor with [monaco](https://github.com/suren-atoyan/monaco-react)
 - AI streaming response with [Vercel AI SDK](https://sdk.vercel.ai/docs)
 - authentication with [kinde](https://kinde.com/)
+- database management with [planetscale](https://planetscale.com/)
 
 # TODO
 - [x] implement auth with kinde
-- [ ] add rate limiting with upstash
-- [ ] set up DB with planetscale
+- [x] set up DB with planetscale
 - [ ] save submissions in DB using prisma
 - [ ] set up jest tests
 

@@ -1,3 +1,4 @@
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import OpenAI from "openai";
 
@@ -11,6 +12,12 @@ const openai = new OpenAI({
  * @see https://sdk.vercel.ai/docs/api-reference/use-completion
  */
 export async function POST(req: Request) {
+  const { isAuthenticated } = getKindeServerSession();
+  const authenticated = await isAuthenticated();
+  if (!authenticated)
+    return new Response("unauthorized", {
+      status: 401,
+    });
   const { prompt, exercise } = await req.json();
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",

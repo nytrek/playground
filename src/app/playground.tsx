@@ -264,8 +264,8 @@ export default function Playground() {
             }),
             {
               loading: "Loading...",
-              success: () => toast.success("Submission updated successfully!"),
-              error: (err) => toast.error(err.message),
+              success: () => "Submission updated successfully!",
+              error: (err) => err.message,
             },
           );
         } else {
@@ -276,8 +276,8 @@ export default function Playground() {
             }),
             {
               loading: "Loading...",
-              success: () => toast.success("Submission saved successfully!"),
-              error: (err) => toast.error(err.message),
+              success: () => "Submission saved successfully!",
+              error: (err) => err.message,
             },
           );
         }
@@ -331,9 +331,8 @@ export default function Playground() {
                     ),
                     {
                       loading: "Loading...",
-                      success: () =>
-                        toast.success("Submission resetted successfully!"),
-                      error: (err) => toast.error(err.message),
+                      success: () => "Submission resetted successfully!",
+                      error: (err) => err.message,
                     },
                   )
                 }
@@ -355,7 +354,7 @@ export default function Playground() {
           </div>
         </div>
         <CodeEditor
-          key={exercise + " - submission"}
+          key={submissions?.length + " - " + exercise + " - submission"}
           onMount={handleEditorDidMount}
           onValidate={handleEditorValidation}
           value={
@@ -365,7 +364,7 @@ export default function Playground() {
           }
         />
         <ReadOnlyEditor
-          key={exercise + " - response"}
+          key={submissions?.length + " - " + exercise + " - response"}
           value={
             completion
               ? completion

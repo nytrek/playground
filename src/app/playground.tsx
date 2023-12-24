@@ -127,7 +127,7 @@ export default function Playground() {
     try {
       if (!editorRef.current?.getValue()) return;
       append({
-        content: `Analyze the following implementation of ${exercise} in typescript - "${editorRef.current
+        content: `Analyze if the provided implementation of ${exercise} in typescript is correct - "${editorRef.current
           .getValue()
           .trim()}". Only respond using code comments and code directly without using markdown.`,
         role: "user",

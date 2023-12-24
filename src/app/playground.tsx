@@ -153,7 +153,7 @@ export default function Playground() {
               <div>
                 <img
                   alt="avatar"
-                  className="inline-block h-9 w-9 rounded-full"
+                  className="inline-block h-10 w-10 rounded-full bg-zinc-700"
                   src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
                 />
               </div>

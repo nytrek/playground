@@ -137,7 +137,7 @@ export default function Playground() {
   return (
     <>
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
-        <div className="sticky top-0 flex h-[7.5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
+        <div className="sticky top-0 flex h-[7.5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
             onChange={(e) =>
@@ -158,7 +158,7 @@ export default function Playground() {
           onValidate={handleEditorValidation}
         />
         <ReadOnlyEditor value={completion} />
-        <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3">
+        <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
           <AnimatePresence mode="popLayout">
             {warnings ? (
               <motion.div
@@ -209,7 +209,14 @@ export default function Playground() {
           </button>
         </div>
       </div>
-      <Toaster position="top-center" visibleToasts={1} />
+      <Toaster
+        toastOptions={{
+          style: {
+            bottom: "4rem",
+          },
+        }}
+        visibleToasts={1}
+      />
     </>
   );
 }

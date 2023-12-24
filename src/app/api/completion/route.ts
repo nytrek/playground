@@ -18,7 +18,13 @@ export async function POST(req: Request) {
     messages: [
       {
         role: "user",
-        content: `Analyze if the provided implementation of ${exercise} in typescript is correct - ${prompt}. Only respond using code comments and code directly without using markdown.`,
+        content: `
+          Analyze if the provided implementation of ${exercise} in typescript is correct - ${prompt}. 
+          Only respond using code comments and code directly without using markdown. 
+          Provide partical feedback to the user and end the response in the following format: // { passed: boolean }.
+          All plain text MUST be prefixed with two slashes like so - //
+          Provide an alternate solution to a ${exercise} implementation in TypeScript.
+        `,
       },
     ],
     temperature: 0,

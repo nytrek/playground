@@ -3,8 +3,16 @@
 Playground built using Next.JS App router, Monaco editor and Vercel AI SDK
 
 # Features
-- visual typescript editor
-- AI streaming response
+- visual typescript editor with [monaco](https://github.com/suren-atoyan/monaco-react)
+- AI streaming response with [Vercel AI SDK](https://sdk.vercel.ai/docs)
+
+# TODO
+- [ ] implement auth with kinde
+- [ ] add rate limiting with upstash
+- [ ] set up DB with planetscale
+- [ ] save submissions in DB using prisma
+- [ ] design navbar
+- [ ] set up jest tests
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

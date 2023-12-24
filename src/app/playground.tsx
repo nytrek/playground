@@ -2,6 +2,8 @@
 
 import { cn } from "@/utils/cn";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import { useCompletion } from "ai/react";
 import {
@@ -13,8 +15,6 @@ import {
 import type * as monaco from "monaco-editor";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -140,7 +140,19 @@ export default function Playground() {
   return (
     <>
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
-        <div className="sticky top-0 flex h-[7.5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
+        <div
+          className={cn(
+            user ? "justify-between" : "justify-end",
+            "sticky top-0 flex h-[7.5%] shrink-0 items-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4",
+          )}
+        >
+          {user && (
+            <img
+              className="inline-block h-10 w-10 rounded-full bg-zinc-500"
+              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
+              alt="avatar"
+            />
+          )}
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
             onChange={(e) =>

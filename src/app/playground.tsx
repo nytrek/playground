@@ -13,6 +13,8 @@ import {
 import type * as monaco from "monaco-editor";
 import { useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -113,6 +115,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Playground() {
+  const { user } = useKindeBrowserClient();
   const { complete, completion, isLoading } = useCompletion();
   const exercises = ["Linear search", "Binary search"];
   const [warnings, setWarnings] = useState(0);
@@ -190,23 +193,29 @@ export default function Playground() {
               </motion.div>
             )}
           </AnimatePresence>
-          <button
-            className={cn(
-              warnings || isLoading
-                ? "cursor-not-allowed opacity-50"
-                : "opacity-100",
-              "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50",
-            )}
-            disabled={!!warnings}
-            onClick={() => handleOnClick()}
-            type="button"
-          >
-            {isLoading ? (
-              <Loading className="h-5 w-5 text-gray-900" />
-            ) : (
-              <span>Submit</span>
-            )}
-          </button>
+          {user ? (
+            <button
+              className={cn(
+                warnings || isLoading
+                  ? "cursor-not-allowed opacity-50"
+                  : "opacity-100",
+                "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50",
+              )}
+              disabled={!!warnings}
+              onClick={() => handleOnClick()}
+              type="button"
+            >
+              {isLoading ? (
+                <Loading className="h-5 w-5 text-gray-900" />
+              ) : (
+                <span>Submit</span>
+              )}
+            </button>
+          ) : (
+            <LoginLink className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50">
+              Submit
+            </LoginLink>
+          )}
         </div>
       </div>
       <Toaster

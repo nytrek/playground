@@ -112,7 +112,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Playground() {
-  const { messages, append } = useChat();
+  const { messages, append, setMessages } = useChat();
   const exercises = ["Linear search", "Binary search"];
   const [warnings, setWarnings] = useState(0);
   const [exercise, setExercise] = useState(exercises[0]);
@@ -123,6 +123,10 @@ export default function Playground() {
   function handleEditorValidation(markers: monaco.editor.IMarker[]) {
     setWarnings(markers.length);
     markers.forEach((marker) => console.log("onValidate:", marker.message));
+  }
+  function handleOnChange(value: string) {
+    setMessages([]);
+    setExercise(exercises.find((item) => item === value) as typeof exercise);
   }
   function handleOnClick() {
     try {
@@ -143,13 +147,7 @@ export default function Playground() {
         <div className="sticky top-0 flex h-[5%] shrink-0 items-center justify-end gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-3 py-2">
           <select
             className="rounded-md border border-zinc-700 bg-transparent py-1.5 pl-3 pr-10 text-white"
-            onChange={(e) =>
-              setExercise(
-                exercises.find(
-                  (item) => item === e.target.value,
-                ) as typeof exercise,
-              )
-            }
+            onChange={(e) => handleOnChange(e.target.value)}
           >
             {exercises.map((item) => (
               <option key={item}>{item}</option>

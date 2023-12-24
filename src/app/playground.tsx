@@ -94,6 +94,14 @@ const CodeEditor: React.FC<EditorProps> = (props) => {
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/split-editor.tsx
  */
 const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
+  function handleEditorDidMount(
+    _editor: monaco.editor.IStandaloneCodeEditor,
+    m: typeof monaco,
+  ) {
+    m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: [2393],
+    });
+  }
   return (
     <Editor
       {...props}
@@ -101,6 +109,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       defaultLanguage="typescript"
       height="40%"
       loading={<Loading className="h-10 w-10" />}
+      onMount={handleEditorDidMount}
       options={{
         ...DEFAULT_OPTIONS,
         lineNumbers: "off",
@@ -142,8 +151,14 @@ export default function Playground() {
   const [warnings, setWarnings] = useState(0);
   const [exercise, setExercise] = useState(exercises[0]);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-  function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+  function handleEditorDidMount(
+    editor: monaco.editor.IStandaloneCodeEditor,
+    m: typeof monaco,
+  ) {
     editorRef.current = editor;
+    m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: [2393],
+    });
   }
   function handleEditorValidation(markers: monaco.editor.IMarker[]) {
     setWarnings(markers.length);

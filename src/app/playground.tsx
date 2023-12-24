@@ -128,11 +128,11 @@ export default function Playground() {
   async function handleOnClick() {
     if (!editorRef.current?.getValue())
       return toast.warning("Submission cannot be empty.");
-    await complete(
-      `Analyze if the provided implementation of ${exercise} in typescript is correct - "${editorRef.current
-        .getValue()
-        .trim()}". Only respond using code comments and code directly without using markdown.`,
-    );
+    await complete(editorRef.current.getValue(), {
+      body: {
+        exercise,
+      },
+    });
   }
   return (
     <>
@@ -192,7 +192,9 @@ export default function Playground() {
           </AnimatePresence>
           <button
             className={cn(
-              warnings ? "cursor-not-allowed opacity-50" : "opacity-100",
+              warnings || isLoading
+                ? "cursor-not-allowed opacity-50"
+                : "opacity-100",
               "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50",
             )}
             disabled={!!warnings}

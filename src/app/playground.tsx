@@ -6,7 +6,7 @@ import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Editor, { type EditorProps } from "@monaco-editor/react";
 import type { Submission } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCompletion } from "ai/react";
 import {
   AnimatePresence,
@@ -127,6 +127,7 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
  * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/vim-mode.tsx
  */
 export default function Playground() {
+  const queryClient = useQueryClient();
   const { user } = useKindeBrowserClient();
   const { data: submissions } = useQuery({
     queryKey: ["submissions"],
@@ -144,6 +145,53 @@ export default function Playground() {
         }
       }
       return ((await response.json()) as Submission[]) ?? null;
+    },
+  });
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      id,
+      submission,
+      response,
+    }: {
+      id: string;
+      submission: string;
+      response: string;
+    }) => {
+      await updateSubmission({
+        id,
+        exercise,
+        submission,
+        response,
+        passed: response.includes("{ passed: true }"),
+        userId: user?.id as string,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissions"],
+      });
+    },
+  });
+  const createMutation = useMutation({
+    mutationFn: async ({
+      submission,
+      response,
+    }: {
+      submission: string;
+      response: string;
+    }) => {
+      await createSubmission({
+        exercise,
+        submission,
+        response,
+        passed: response.includes("{ passed: true }"),
+        userId: user?.id as string,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["submissions"],
+      });
     },
   });
   const { complete, completion, error, isLoading } = useCompletion();
@@ -188,34 +236,30 @@ export default function Playground() {
           const id = submissions?.find(
             (item) => item.exercise === exercise && item.userId === user?.id,
           )?.id as string;
-          try {
-            await updateSubmission({
+          toast.promise(
+            updateMutation.mutateAsync({
               id,
-              exercise,
               submission: editorRef.current.getValue(),
               response,
-              passed: response.includes("{ passed: true }"),
-              userId: user?.id as string,
-            });
-            toast.success("Submission updated successfully!");
-          } catch (err: any) {
-            toast.error(err.message);
-            console.log(err.message);
-          }
+            }),
+            {
+              loading: "Loading...",
+              success: () => toast.success("Submission updated successfully!"),
+              error: (err) => toast.error(err.message),
+            },
+          );
         } else {
-          try {
-            await createSubmission({
-              exercise,
+          toast.promise(
+            createMutation.mutateAsync({
               submission: editorRef.current.getValue(),
               response,
-              passed: response.includes("{ passed: true }"),
-              userId: user?.id as string,
-            });
-            toast.success("Submission saved successfully!");
-          } catch (err: any) {
-            toast.error(err.message);
-            console.log(err.message);
-          }
+            }),
+            {
+              loading: "Loading...",
+              success: () => toast.success("Submission saved successfully!"),
+              error: (err) => toast.error(err.message),
+            },
+          );
         }
       }
     }
@@ -266,11 +310,7 @@ export default function Playground() {
           </select>
         </div>
         <CodeEditor
-          key={
-            submissions?.find(
-              (item) => item.exercise === exercise && item.userId === user?.id,
-            )?.submission
-          }
+          key={exercise + " - submission"}
           onMount={handleEditorDidMount}
           onValidate={handleEditorValidation}
           value={
@@ -280,14 +320,7 @@ export default function Playground() {
           }
         />
         <ReadOnlyEditor
-          key={
-            completion
-              ? completion
-              : submissions?.find(
-                  (item) =>
-                    item.exercise === exercise && item.userId === user?.id,
-                )?.response
-          }
+          key={exercise + " - response"}
           value={
             completion
               ? completion
@@ -332,7 +365,7 @@ export default function Playground() {
           {user ? (
             <button
               className={cn(
-                warnings || isLoading
+                warnings || isLoading || queryClient.isMutating()
                   ? "cursor-not-allowed opacity-50"
                   : "opacity-100",
                 "rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-all duration-300 hover:bg-gray-50",

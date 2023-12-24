@@ -203,7 +203,7 @@ export default function Playground() {
             onClick={() => handleOnClick()}
             type="button"
           >
-            Run code
+            Submit
           </button>
         </div>
       </div>

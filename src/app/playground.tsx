@@ -132,7 +132,7 @@ export default function Playground() {
   /**
    * @see https://sdk.vercel.ai/docs/api-reference/use-completion
    */
-  const handleOnClick = useCallback(async () => {
+  const handleOnClick = async () => {
     if (!editorRef.current?.getValue())
       return toast.warning("Submission cannot be empty.");
     const response = await complete(editorRef.current.getValue(), {
@@ -152,12 +152,12 @@ export default function Playground() {
             passed: response.includes("{ passed: true }"),
             userId: user?.id as string,
           });
-        } catch (error: any) {
-          toast.error(error.message);
+        } catch (err: any) {
+          toast.error(err.message);
         }
       }
     }
-  }, [complete]);
+  };
   return (
     <>
       <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">

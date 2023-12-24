@@ -1,4 +1,4 @@
-import { Submission } from "@prisma/client";
+import type { Submission } from "@prisma/client";
 import { create } from "zustand";
 
 interface State {

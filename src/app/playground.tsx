@@ -499,7 +499,7 @@ export default function Playground() {
             />
           </div>
         </div>
-        <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
+        <div className="sticky bottom-0 flex h-[75px] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
           <AnimatePresence mode="popLayout">
             {warnings ? (
               <motion.div

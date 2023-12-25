@@ -324,7 +324,7 @@ export default function Playground() {
       const height = initialHeight - dy;
 
       if (height >= MIN_HEIGHT) {
-        const newHeight = Math.min(height, wrapperRef.offsetHeight - 200);
+        const newHeight = Math.min(height, wrapperRef.offsetHeight - 300);
         responsePanelRef.style.height = `${newHeight}px`;
       }
     };
@@ -375,7 +375,7 @@ export default function Playground() {
       if (responsePanelRef.offsetHeight >= MIN_HEIGHT) {
         responsePanelRef.style.height = `${Math.min(
           responsePanelRef.offsetHeight,
-          wrapperRef.offsetHeight - 200,
+          wrapperRef.offsetHeight - 300,
         )}px`;
       }
     };
@@ -399,7 +399,7 @@ export default function Playground() {
         <div
           className={cn(
             user ? "sm:justify-between" : "sm:justify-end",
-            "sticky top-0 flex h-[100px] shrink-0 flex-col justify-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4 sm:flex-row sm:items-center",
+            "sticky top-0 flex h-[150px] sm:h-[100px] shrink-0 flex-col justify-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4 sm:flex-row sm:items-center",
           )}
         >
           {user && (

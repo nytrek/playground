@@ -9,6 +9,7 @@ Playground built using Next.JS App router, Monaco editor and Vercel AI SDK
 - database management with [planetscale](https://planetscale.com/)
 - state management with [zustand](https://github.com/pmndrs/zustand)
 - unit testing with [jest](https://jestjs.io/)
+- panel resizer based on implementation from [typehero](https://github.com/typehero/typehero/blob/main/packages/monaco/src/split-editor.tsx#L185-L282)
 
 # TODO
 - [x] implement auth with kinde

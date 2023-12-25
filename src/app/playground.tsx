@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/utils/cn";
+import { getEventDeltas, preventSelection } from "@/utils/helpers";
 import {
   ArrowPathIcon,
   CheckCircleIcon,
@@ -19,7 +20,7 @@ import {
   type Variants,
 } from "framer-motion";
 import type * as monaco from "monaco-editor";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Toaster, toast } from "sonner";
 import {
   createSubmission,
@@ -27,6 +28,8 @@ import {
   updateSubmission,
 } from "./actions";
 import { exercises, useExerciseStore } from "./store";
+
+const MIN_HEIGHT = 300;
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
@@ -91,7 +94,6 @@ const CodeEditor: React.FC<EditorProps> = (props) => {
       {...props}
       className="border border-zinc-700"
       defaultLanguage="typescript"
-      height="45%"
       loading={<Loading className="h-10 w-10" />}
       options={DEFAULT_OPTIONS}
       theme="vs-dark"
@@ -116,7 +118,6 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
       {...props}
       className="border border-zinc-700"
       defaultLanguage="typescript"
-      height="40%"
       loading={<Loading className="h-10 w-10" />}
       onMount={handleEditorDidMount}
       options={{
@@ -138,6 +139,10 @@ const ReadOnlyEditor: React.FC<EditorProps> = (props) => {
 export default function Playground() {
   const queryClient = useQueryClient();
   const { user } = useKindeBrowserClient();
+  const resizer = useRef<HTMLDivElement>(null);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const responsePanel = useRef<HTMLDivElement>(null);
+  const responsePanelSection = useRef<HTMLDivElement>(null);
   const { data: submissions } = useQuery({
     queryKey: ["submissions"],
     queryFn: async () => {
@@ -218,6 +223,7 @@ export default function Playground() {
   const { complete, completion, error, isLoading } = useCompletion();
   const { exercise, setExercise } = useExerciseStore();
   const [warnings, setWarnings] = useState(0);
+  const [responsePanelHeight, setResponsePanelHeight] = useState(MIN_HEIGHT);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   function handleEditorDidMount(
     editor: monaco.editor.IStandaloneCodeEditor,
@@ -284,15 +290,116 @@ export default function Playground() {
       }
     }
   };
+  /**
+   * @see https://github.com/typehero/typehero/blob/main/packages/monaco/src/split-editor.tsx#L185-L282
+   */
+  useEffect(() => {
+    const resizerRef = resizer.current;
+    const responsePanelRef = responsePanel.current;
+    const responsePanelSectionRef = responsePanelSection.current;
+    const wrapperRef = wrapper.current;
+
+    if (
+      !resizerRef ||
+      !responsePanelRef ||
+      !wrapperRef ||
+      !responsePanelSectionRef
+    ) {
+      return;
+    }
+
+    let y = 0;
+    let initialHeight = responsePanelRef.offsetHeight;
+
+    const mouseMoveHandler = (e: MouseEvent | TouchEvent) => {
+      // Remove transition during drag because of performance issues
+      if (responsePanelSectionRef.classList.contains("transition-all")) {
+        responsePanelSectionRef.classList.remove("transition-all");
+      }
+
+      document.body.style.setProperty("cursor", "row-resize");
+
+      const { dy } = getEventDeltas(e, { x: 0, y });
+
+      const height = initialHeight - dy;
+
+      if (height >= MIN_HEIGHT) {
+        const newHeight = Math.min(height, wrapperRef.offsetHeight - 200);
+        responsePanelRef.style.height = `${newHeight}px`;
+      }
+    };
+
+    const mouseDownHandler = (e: MouseEvent | TouchEvent) => {
+      initialHeight = responsePanelRef.offsetHeight;
+
+      if (e instanceof MouseEvent) {
+        y = e.clientY;
+      } else if (e instanceof TouchEvent) {
+        y = e.touches[0]?.clientY ?? 0;
+      }
+
+      if (e instanceof MouseEvent) {
+        document.addEventListener("mousemove", mouseMoveHandler);
+        document.addEventListener("mouseup", mouseUpHandler);
+      } else if (e instanceof TouchEvent) {
+        document.addEventListener("touchmove", mouseMoveHandler);
+        document.addEventListener("touchend", mouseUpHandler);
+      }
+
+      // Prevent selection during drag
+      document.addEventListener("selectstart", preventSelection);
+    };
+
+    const mouseUpHandler = function () {
+      // Restore transition
+      responsePanelSectionRef.classList.add("transition-all");
+
+      document.body.style.removeProperty("cursor");
+
+      document.removeEventListener("touchmove", mouseMoveHandler);
+      document.removeEventListener("mousemove", mouseMoveHandler);
+      document.removeEventListener("touchend", mouseUpHandler);
+      document.removeEventListener("mouseup", mouseUpHandler);
+
+      // Restore selection
+      document.removeEventListener("selectstart", preventSelection);
+
+      setResponsePanelHeight(
+        responsePanelRef.offsetHeight < MIN_HEIGHT
+          ? MIN_HEIGHT
+          : responsePanelRef.offsetHeight,
+      );
+    };
+
+    const resizeHandler = () => {
+      if (responsePanelRef.offsetHeight >= MIN_HEIGHT) {
+        responsePanelRef.style.height = `${Math.min(
+          responsePanelRef.offsetHeight,
+          wrapperRef.offsetHeight - 200,
+        )}px`;
+      }
+    };
+
+    window.addEventListener("resize", resizeHandler);
+    resizerRef.addEventListener("mousedown", mouseDownHandler);
+    resizerRef.addEventListener("touchstart", mouseDownHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+      resizerRef.removeEventListener("mousedown", mouseDownHandler);
+      resizerRef.removeEventListener("touchstart", mouseDownHandler);
+    };
+  }, [setResponsePanelHeight]);
   return (
     <>
-      <div className="h-[calc(100vh-2rem)] overflow-hidden rounded-lg">
+      <div
+        className="flex h-[calc(100vh-2rem)] flex-col rounded-lg"
+        ref={wrapper}
+      >
         <div
           className={cn(
-            user
-              ? "h-[15%] sm:h-[7.5%] sm:justify-between"
-              : "h-[7.5%] sm:justify-end",
-            "sticky top-0 flex shrink-0 flex-col justify-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4 sm:flex-row sm:items-center",
+            user ? "sm:justify-between" : "sm:justify-end",
+            "sticky top-0 flex h-[100px] shrink-0 flex-col justify-center gap-4 rounded-t-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4 sm:flex-row sm:items-center",
           )}
         >
           {user && (
@@ -353,27 +460,45 @@ export default function Playground() {
             </select>
           </div>
         </div>
-        <CodeEditor
-          key={submissions?.length + " - " + exercise + " - submission"}
-          onMount={handleEditorDidMount}
-          onValidate={handleEditorValidation}
-          value={
-            submissions?.find(
-              (item) => item.exercise === exercise && item.userId === user?.id,
-            )?.submission
-          }
-        />
-        <ReadOnlyEditor
-          key={submissions?.length + " - " + exercise + " - response"}
-          value={
-            completion
-              ? completion
-              : submissions?.find(
-                  (item) =>
-                    item.exercise === exercise && item.userId === user?.id,
-                )?.response
-          }
-        />
+        <div className="h-full overflow-hidden">
+          <CodeEditor
+            key={submissions?.length + " - " + exercise + " - submission"}
+            onMount={handleEditorDidMount}
+            onValidate={handleEditorValidation}
+            value={
+              submissions?.find(
+                (item) =>
+                  item.exercise === exercise && item.userId === user?.id,
+              )?.submission
+            }
+          />
+        </div>
+        <div className="transition-all" ref={responsePanelSection}>
+          <div
+            className="group cursor-row-resize border-y border-zinc-200 bg-zinc-100 p-2 dark:border-zinc-700 dark:bg-zinc-800"
+            ref={resizer}
+          >
+            <div className="m-auto h-1 w-24 rounded-full bg-zinc-300 duration-300 group-hover:bg-blue-500 group-active:bg-blue-500 dark:bg-zinc-700 group-hover:dark:bg-blue-500" />
+          </div>
+          <div
+            ref={responsePanel}
+            style={{
+              height: `${responsePanelHeight}px`,
+            }}
+          >
+            <ReadOnlyEditor
+              key={submissions?.length + " - " + exercise + " - response"}
+              value={
+                completion
+                  ? completion
+                  : submissions?.find(
+                      (item) =>
+                        item.exercise === exercise && item.userId === user?.id,
+                    )?.response
+              }
+            />
+          </div>
+        </div>
         <div className="sticky bottom-0 flex h-[7.5%] shrink-0 items-center justify-between gap-4 rounded-b-lg border-x border-t border-zinc-700 bg-[#1e1e1e] px-4">
           <AnimatePresence mode="popLayout">
             {warnings ? (

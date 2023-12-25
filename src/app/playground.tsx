@@ -29,7 +29,7 @@ import {
 } from "./actions";
 import { exercises, useExerciseStore } from "./store";
 
-const MIN_HEIGHT = 300;
+const MIN_HEIGHT = 150;
 
 const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,

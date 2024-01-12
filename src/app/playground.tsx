@@ -161,6 +161,8 @@ export default function Playground() {
       return ((await response.json()) as Submission[]) ?? null;
     },
   });
+  const { complete, completion, error, isLoading, setCompletion } =
+    useCompletion();
   const updateMutation = useMutation({
     mutationFn: async ({
       id,
@@ -215,12 +217,12 @@ export default function Playground() {
       });
     },
     onSuccess: () => {
+      setCompletion("");
       queryClient.invalidateQueries({
         queryKey: ["submissions"],
       });
     },
   });
-  const { complete, completion, error, isLoading } = useCompletion();
   const { exercise, setExercise } = useExerciseStore();
   const [warnings, setWarnings] = useState(0);
   const [responsePanelHeight, setResponsePanelHeight] = useState(MIN_HEIGHT);

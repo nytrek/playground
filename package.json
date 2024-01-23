@@ -21,7 +21,7 @@
     "@tanstack/react-query": "^5.14.6",
     "ai": "^2.2.30",
     "clsx": "^2.0.0",
-    "framer-motion": "^10.16.16",
+    "framer-motion": "^11.0.0",
     "monaco-editor": "^0.45.0",
     "next": "14.0.4",
     "openai": "^4.24.1",

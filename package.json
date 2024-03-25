@@ -16,7 +16,7 @@
     "@heroicons/react": "^2.1.1",
     "@kinde-oss/kinde-auth-nextjs": "^2.0.13",
     "@monaco-editor/react": "^4.6.0",
-    "@prisma/client": "5.7.1",
+    "@prisma/client": "5.11.0",
     "@prisma/extension-accelerate": "^0.6.2",
     "@tanstack/react-query": "^5.14.6",
     "ai": "^2.2.30",
